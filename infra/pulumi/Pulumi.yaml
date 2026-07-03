@@ -1,0 +1,3 @@
+name: platform-interview
+runtime: nodejs
+description: Simplified infrastructure sketch for the Booking API (review artifact only)

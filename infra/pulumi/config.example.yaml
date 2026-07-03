@@ -1,0 +1,5 @@
+# Example Pulumi stack configuration.
+# Copy to Pulumi.<stack>.yaml for a real stack (not required for review).
+config:
+  platform-interview:dbPassword: changeme
+  platform-interview:containerImage: platform-interview-api:latest

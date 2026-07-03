@@ -1,0 +1,11 @@
+{
+  "name": "platform-interview-infra",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pulumi stack for review only — not deployed",
+  "main": "index.ts",
+  "dependencies": {
+    "@pulumi/aws": "^6.0.0",
+    "@pulumi/pulumi": "^3.0.0"
+  }
+}
