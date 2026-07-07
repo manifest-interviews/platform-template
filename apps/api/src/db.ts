@@ -19,3 +19,7 @@ export async function query<T extends Row = Row>(
   const result = await pool.query(text, params);
   return result.rows as T[];
 }
+
+export async function closePool(): Promise<void> {
+  await pool.end();
+}

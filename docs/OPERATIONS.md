@@ -2,22 +2,42 @@
 
 Basic operational notes for running the Booking API.
 
+## Processes
+
+- **API** — stateless HTTP server. Safe to run multiple replicas.
+- **Worker** — background reminders + payment reconciliation. Must run as a
+  **single instance**: two workers running at once would double-send reminders
+  and double-process reconciliation.
+
 ## Endpoints
 
 - `GET /health` — liveness. Returns 200 whenever the process is up.
-- `GET /ready` — intended as a readiness signal. See the note in the code: it
-  does not currently verify downstream dependencies.
+- `GET /ready` — readiness. Verifies the database is reachable; returns 503
+  when it is not.
 
 ## Logs
 
-The app logs plain text lines to stdout/stderr via `console`. Logs are not
-structured and do not include a request/correlation ID, so tracing a single
-request across log lines is not currently possible.
+Structured JSON to stdout/stderr (pino). Every request log line carries a
+`reqId`; the API honours an incoming `x-request-id` header and echoes it on the
+response, so a request can be traced across services and log lines.
 
 ## Configuration
 
-Configuration is read from environment variables (see `.env.example`). There is
-no validation at startup.
+Configuration is read from environment variables (see `.env.example`) and
+validated at startup — the process exits with a clear error naming the missing
+variable rather than failing later at first use.
+
+## Caching
+
+Read-heavy endpoints use a Redis cache-aside with a short TTL. Redis being
+unavailable degrades latency but does not fail requests (fail-open); writes
+invalidate the affected keys.
+
+## Graceful shutdown
+
+On SIGTERM/SIGINT the API stops accepting connections, drains in-flight
+requests, then closes Redis and the database pool. The worker finishes its
+current pass and exits.
 
 ## Metrics / alerting
 

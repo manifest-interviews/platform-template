@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { query } from "../db.js";
+import { cacheAside, invalidate } from "../redis.js";
 
 interface BookingBody {
   customer_id?: number;
@@ -9,11 +10,13 @@ interface BookingBody {
 
 const BOOKING_COLUMNS =
   "id, customer_id, status, booking_date, notes, created_at, updated_at";
+const BOOKINGS_CACHE_KEY = "bookings:list";
 
 export async function bookingRoutes(app: FastifyInstance): Promise<void> {
+  // Read-heavy endpoint; cache-aside with a short TTL. Writes below invalidate.
   app.get("/bookings", async () => {
-    const bookings = await query(
-      `SELECT ${BOOKING_COLUMNS} FROM bookings ORDER BY created_at DESC`,
+    const bookings = await cacheAside(BOOKINGS_CACHE_KEY, 30, () =>
+      query(`SELECT ${BOOKING_COLUMNS} FROM bookings ORDER BY created_at DESC`),
     );
     return { bookings };
   });
@@ -45,6 +48,7 @@ export async function bookingRoutes(app: FastifyInstance): Promise<void> {
        RETURNING ${BOOKING_COLUMNS}`,
       [body.customer_id, body.booking_date, body.notes ?? null],
     );
+    await invalidate(BOOKINGS_CACHE_KEY);
     return reply.status(201).send({ booking: rows[0] });
   });
 
@@ -60,6 +64,7 @@ export async function bookingRoutes(app: FastifyInstance): Promise<void> {
     if (rows.length === 0) {
       return reply.status(404).send({ error: "booking not found" });
     }
+    await invalidate(BOOKINGS_CACHE_KEY);
     return { booking: rows[0] };
   });
 }

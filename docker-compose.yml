@@ -13,14 +13,57 @@ services:
       timeout: 5s
       retries: 5
 
-  app:
-    build: .
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # One-shot migration runner (uses the build stage, which has tsx + all deps).
+  migrate:
+    build:
+      context: .
+      target: build
+    command: ["pnpm", "db:migrate"]
+    environment:
+      DATABASE_URL: postgres://app:app@postgres:5432/platform_interview
     depends_on:
       postgres:
         condition: service_healthy
+
+  app:
+    build: .
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
     environment:
       DATABASE_URL: postgres://app:app@postgres:5432/platform_interview
+      REDIS_URL: redis://redis:6379
+      PAYMENT_PROCESSOR_URL: http://payment-processor.example.com
+      PAYMENT_WEBHOOK_SECRET: dev-webhook-secret
       PORT: 3000
       NODE_ENV: production
     ports:
       - "3000:3000"
+
+  # Same image as the API, different command. Must run as a single instance.
+  worker:
+    build: .
+    command: ["node", "apps/api/dist/worker.js"]
+    healthcheck:
+      disable: true # image HEALTHCHECK probes HTTP; the worker serves none
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: postgres://app:app@postgres:5432/platform_interview
+      REDIS_URL: redis://redis:6379
+      PAYMENT_PROCESSOR_URL: http://payment-processor.example.com
+      PAYMENT_WEBHOOK_SECRET: dev-webhook-secret
+      NODE_ENV: production

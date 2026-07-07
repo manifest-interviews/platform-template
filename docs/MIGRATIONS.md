@@ -19,9 +19,6 @@ re-run.
 - There is no `down`/rollback mechanism. Reversing a change means writing a new
   forward migration (and some changes, like a dropped column, cannot recover
   lost data).
-- `003_drop_legacy_status.sql` is included as an example of a destructive change
-  proposed by a product engineer. It will be applied automatically by the
-  current runner.
 
 ## Not yet covered
 
