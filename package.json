@@ -1,0 +1,28 @@
+{
+  "name": "platform-interview-template",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Small Booking API used for Staff DevOps / Platform Engineer interviews",
+  "packageManager": "pnpm@10.12.4",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @platform-interview/api dev",
+    "build": "pnpm --filter @platform-interview/api build",
+    "start": "pnpm --filter @platform-interview/api start",
+    "typecheck": "pnpm --filter @platform-interview/api typecheck",
+    "test": "pnpm --filter @platform-interview/api test",
+    "db:migrate": "tsx --env-file-if-exists=.env scripts/migrate.ts",
+    "db:seed": "tsx --env-file-if-exists=.env scripts/seed.ts",
+    "smoke:test": "tsx scripts/smoke-test.ts",
+    "migration:check": "tsx scripts/check-migrations.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}

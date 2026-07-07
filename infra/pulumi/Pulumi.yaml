@@ -1,0 +1,3 @@
+name: platform-interview
+runtime: nodejs
+description: Infrastructure for the Booking API (empty — nothing is deployed)
