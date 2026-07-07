@@ -16,14 +16,18 @@ Pre-work should be light — please do not spend more than **30–60 minutes**.
 2. Get the service running locally (see below).
 3. Run the tests.
 4. Skim the code and the docs in `docs/`.
-5. Be prepared to discuss how the system fits together and what it depends on.
+5. Come able to reason about the service with us — how it's built, how it would
+   run in the cloud, what it depends on, and what it takes to operate it.
 
 ## What to expect in the interview
 
-During the interview we will work together on an ambiguous design problem. You
-may use an AI coding agent of your choice. We are not looking for a perfect
-finished solution — we are interested in how you clarify requirements, identify
-risks, use tooling, make tradeoffs, and communicate your reasoning.
+During the interview we'll work through an open-ended design problem together,
+with this service as the backdrop. You'll be given the problem in the session —
+it's a live, collaborative discussion (with a shared whiteboard), not a coding
+exercise or something to build ahead of time. You may use an AI agent of your
+choice. We are not looking for a polished or finished answer — we are interested
+in how you clarify an ambiguous problem, weigh tradeoffs, and communicate your
+reasoning as you go.
 
 ## The system
 
